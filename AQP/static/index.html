@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AuraAQI - AI Air Quality Analytics & Predictor</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Leaflet.js Map CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <!-- Custom Style -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-background"></div>
+    <div class="app-container">
+        <!-- Top Navigation -->
+        <header class="app-header">
+            <div class="brand">
+                <div class="logo-icon">
+                    <i class="fa-solid fa-wind"></i>
+                </div>
+                <div class="brand-text">
+                    <h1>AuraAQI</h1>
+                    <span>Predictive AI Dashboard</span>
+                </div>
+            </div>
+            <nav class="nav-tabs">
+                <button class="nav-tab" data-tab="predictor">
+                    <i class="fa-solid fa-calculator"></i> Predictor
+                </button>
+                <button class="nav-tab active" data-tab="insights">
+                    <i class="fa-solid fa-chart-line"></i> Insights & Map
+                </button>
+                <button class="nav-tab" data-tab="explorer">
+                    <i class="fa-solid fa-database"></i> Data Explorer
+                </button>
+                <button class="nav-tab" data-tab="metrics">
+                    <i class="fa-solid fa-gauge-high"></i> Model Metrics
+                </button>
+            </nav>
+            <div class="system-status">
+                <span class="status-dot online"></span>
+                <span class="status-text">AI Model Online</span>
+            </div>
+        </header>
+
+        <!-- Main Body -->
+        <main class="app-main">
+            <!-- TAB 1: PREDICTOR -->
+            <section id="tab-predictor" class="tab-content">
+                <div class="predictor-grid">
+                    <!-- Left Side: Inputs -->
+                    <div class="glass-card input-panel">
+                        <div class="card-header">
+                            <h2>Pollutant AQI Levels</h2>
+                            <p>Adjust the individual pollutant AQI sliders to predict the overall air quality.</p>
+                        </div>
+                        <div class="sliders-container">
+                            <!-- PM2.5 -->
+                            <div class="slider-group" data-pollutant="pm25">
+                                <div class="slider-info">
+                                    <div class="pollutant-title">
+                                        <span class="badge pm25-bg">PM2.5</span>
+                                        <label for="input-pm25">Particulate Matter 2.5</label>
+                                    </div>
+                                    <input type="number" id="num-pm25" class="numeric-input" min="0" max="500" value="51">
+                                </div>
+                                <div class="range-wrapper">
+                                    <input type="range" id="input-pm25" min="0" max="500" value="51" class="custom-range">
+                                    <div class="range-track-fill"></div>
+                                </div>
+                                <div class="slider-labels">
+                                    <span>Good (0-50)</span>
+                                    <span>Hazardous (500)</span>
+                                </div>
+                            </div>
+                            <!-- Ozone -->
+                            <div class="slider-group" data-pollutant="ozone">
+                                <div class="slider-info">
+                                    <div class="pollutant-title">
+                                        <span class="badge ozone-bg">Ozone</span>
+                                        <label for="input-ozone">Ozone (O₃)</label>
+                                    </div>
+                                    <input type="number" id="num-ozone" class="numeric-input" min="0" max="300" value="36">
+                                </div>
+                                <div class="range-wrapper">
+                                    <input type="range" id="input-ozone" min="0" max="300" value="36" class="custom-range">
+                                    <div class="range-track-fill"></div>
+                                </div>
+                                <div class="slider-labels">
+                                    <span>Good (0-50)</span>
+                                    <span>Extreme (300)</span>
+                                </div>
+                            </div>
+                            <!-- NO2 -->
+                            <div class="slider-group" data-pollutant="no2">
+                                <div class="slider-info">
+                                    <div class="pollutant-title">
+                                        <span class="badge no2-bg">NO2</span>
+                                        <label for="input-no2">Nitrogen Dioxide</label>
+                                    </div>
+                                    <input type="number" id="num-no2" class="numeric-input" min="0" max="200" value="5">
+                                </div>
+                                <div class="range-wrapper">
+                                    <input type="range" id="input-no2" min="0" max="200" value="5" class="custom-range">
+                                    <div class="range-track-fill"></div>
+                                </div>
+                                <div class="slider-labels">
+                                    <span>Good (0-50)</span>
+                                    <span>Extreme (200)</span>
+                                </div>
+                            </div>
+                            <!-- CO -->
+                            <div class="slider-group" data-pollutant="co">
+                                <div class="slider-info">
+                                    <div class="pollutant-title">
+                                        <span class="badge co-bg">CO</span>
+                                        <label for="input-co">Carbon Monoxide</label>
+                                    </div>
+                                    <input type="number" id="num-co" class="numeric-input" min="0" max="150" value="1">
+                                </div>
+                                <div class="range-wrapper">
+                                    <input type="range" id="input-co" min="0" max="150" value="1" class="custom-range">
+                                    <div class="range-track-fill"></div>
+                                </div>
+                                <div class="slider-labels">
+                                    <span>Good (0-50)</span>
+                                    <span>Extreme (150)</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Side: Predictions -->
+                    <div class="glass-card output-panel">
+                        <div class="card-header center">
+                            <h2>Predicted Air Quality</h2>
+                            <p>Calculated dynamically by the Random Forest model</p>
+                        </div>
+                        <div class="prediction-display">
+                            <div class="gauge-container">
+                                <svg class="gauge-svg" viewBox="0 0 200 200">
+                                    <circle class="gauge-bg" cx="100" cy="100" r="80"></circle>
+                                    <circle id="gauge-fill" class="gauge-fill" cx="100" cy="100" r="80"></circle>
+                                </svg>
+                                <div class="gauge-content">
+                                    <span class="gauge-title">AQI</span>
+                                    <h3 id="predicted-aqi-value">--</h3>
+                                    <span id="predicted-aqi-class" class="aqi-class-badge">Loading...</span>
+                                </div>
+                            </div>
+                            
+                            <div class="health-impact-card">
+                                <div class="health-icon">
+                                    <i id="health-emoji" class="fa-solid fa-face-smile"></i>
+                                </div>
+                                <div class="health-text">
+                                    <h4 id="health-title">Good</h4>
+                                    <p id="health-desc">Air quality is satisfactory, and air pollution poses little or no risk.</p>
+                                </div>
+                            </div>
+
+                            <div class="recommendations-box">
+                                <h5><i class="fa-solid fa-shield-halved"></i> Health Recommendations</h5>
+                                <ul id="health-recommendations">
+                                    <li>Perfect day for outdoor activities, sports, and ventilation.</li>
+                                    <li>No special precautions required for any group of people.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 2: INSIGHTS & MAP -->
+            <section id="tab-insights" class="tab-content active">
+                <div class="insights-grid">
+                    <!-- Map Card -->
+                    <div class="glass-card map-card full-width">
+                        <div class="card-header">
+                            <h2>Geographical AQI Heatmap</h2>
+                            <p>Global spatial distribution of dataset measurement coordinates. Hover or click markers to inspect specific values.</p>
+                        </div>
+                        <div id="map-container">
+                            <div id="map"></div>
+                            <div class="map-legend">
+                                <h4>AQI Categories</h4>
+                                <div><span class="dot good"></span> Good (0-50)</div>
+                                <div><span class="dot moderate"></span> Moderate (51-100)</div>
+                                <div><span class="dot sensitive"></span> Sensitive Groups (101-150)</div>
+                                <div><span class="dot unhealthy"></span> Unhealthy (151-200)</div>
+                                <div><span class="dot very-unhealthy"></span> Very Unhealthy (201-300)</div>
+                                <div><span class="dot hazardous"></span> Hazardous (301+)</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Distributions & Correlations -->
+                    <div class="glass-card chart-card full-width">
+                        <div class="card-header">
+                            <h2>Average Pollutant AQIs</h2>
+                            <p>Comparison of mean values across the entire dataset.</p>
+                        </div>
+                        <div class="chart-wrapper">
+                            <canvas id="chart-averages"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 3: DATA EXPLORER -->
+            <section id="tab-explorer" class="tab-content">
+                <div class="glass-card data-explorer-card">
+                    <div class="table-controls">
+                        <div class="search-box">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                            <input type="text" id="table-search" placeholder="Search dataset (e.g. by coordinates or values)...">
+                        </div>
+                        <div class="table-summary-info">
+                            Showing <span id="table-showing-range">0-0</span> of <span id="table-total-records">0</span> records
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th class="sortable" data-col="aqi">AQI Value <i class="fa-solid fa-sort"></i></th>
+                                    <th class="sortable" data-col="pm25">PM2.5 AQI <i class="fa-solid fa-sort"></i></th>
+                                    <th class="sortable" data-col="ozone">Ozone AQI <i class="fa-solid fa-sort"></i></th>
+                                    <th class="sortable" data-col="no2">NO2 AQI <i class="fa-solid fa-sort"></i></th>
+                                    <th class="sortable" data-col="co">CO AQI <i class="fa-solid fa-sort"></i></th>
+                                    <th class="sortable" data-col="lat">Latitude <i class="fa-solid fa-sort"></i></th>
+                                    <th class="sortable" data-col="lng">Longitude <i class="fa-solid fa-sort"></i></th>
+                                </tr>
+                            </thead>
+                            <tbody id="table-body">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="table-pagination">
+                        <button id="btn-prev-page" class="btn-page"><i class="fa-solid fa-chevron-left"></i> Previous</button>
+                        <span id="page-indicator">Page 1 of 1</span>
+                        <button id="btn-next-page" class="btn-page">Next <i class="fa-solid fa-chevron-right"></i></button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 4: MODEL METRICS -->
+            <section id="tab-metrics" class="tab-content">
+                <div class="metrics-container">
+                    <!-- Metrics Cards -->
+                    <div class="metrics-summary-grid">
+                        <div class="glass-card metric-item-card">
+                            <div class="metric-icon">
+                                <i class="fa-solid fa-award"></i>
+                            </div>
+                            <div class="metric-stats">
+                                <span class="metric-label">R² Score (Coefficient of Determination)</span>
+                                <h3 id="metric-r2">--</h3>
+                                <p>Explains 99.8% of variance in overall AQI based on the individual pollutants.</p>
+                            </div>
+                        </div>
+
+                        <div class="glass-card metric-item-card">
+                            <div class="metric-icon">
+                                <i class="fa-solid fa-arrow-down-short-wide"></i>
+                            </div>
+                            <div class="metric-stats">
+                                <span class="metric-label">Mean Absolute Error (MAE)</span>
+                                <h3 id="metric-mae">--</h3>
+                                <p>On average, predictions differ from the actual AQI by less than 0.1 units.</p>
+                            </div>
+                        </div>
+
+                        <div class="glass-card metric-item-card">
+                            <div class="metric-icon">
+                                <i class="fa-solid fa-circle-nodes"></i>
+                            </div>
+                            <div class="metric-stats">
+                                <span class="metric-label">Mean Squared Error (MSE)</span>
+                                <h3 id="metric-mse">--</h3>
+                                <p>Low penalization score indicates high precision and zero critical prediction outliers.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Performance Chart -->
+                    <div class="glass-card performance-chart-card">
+                        <div class="card-header">
+                            <h2>Actual vs Predicted AQI Curve</h2>
+                            <p>Visual overlay comparing random test dataset samples against their predicted values to demonstrate regression accuracy.</p>
+                        </div>
+                        <div class="chart-wrapper large-chart">
+                            <canvas id="chart-performance"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="app-footer">
+            <p>&copy; 2026 AuraAQI Dashboard. Powered by a Random Forest Regressor Model.</p>
+        </footer>
+    </div>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Leaflet.js -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <!-- Custom Scripts -->
+    <script src="script.js"></script>
+</body>
+</html>
