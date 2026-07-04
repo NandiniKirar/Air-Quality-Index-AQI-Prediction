@@ -15,25 +15,6 @@ multi-model training & tuning → evaluation → REST API → interactive dashbo
 
 ---
 
-## 📖 Table of Contents
-
-- [Overview](#-overview)
-- [Architecture](#-architecture)
-- [Folder Structure](#-folder-structure)
-- [Screenshots](#-screenshots)
-- [Installation](#-installation)
-- [Usage](#-usage)
-- [REST API](#-rest-api)
-- [Model Details](#-model-details)
-- [Results](#-results)
-- [Testing](#-testing)
-- [Docker Deployment](#-docker-deployment)
-- [Future Improvements](#-future-improvements)
-- [Contributing](#-contributing)
-- [License](#-license)
-
----
-
 ## 🧭 Overview
 
 Air pollution monitoring stations report raw pollutant concentrations, but the public-facing metric
@@ -42,22 +23,8 @@ system that:
 
 1. Cleans and engineers features from raw sensor data.
 2. Trains and compares **11 regression algorithms**.
-3. Automatically selects and hyperparameter-tunes the best one.
-4. Serves predictions via a **FastAPI REST API**.
-5. Visualizes predictions in an interactive **Streamlit dashboard** with AQI category, health advice,
-   and a live gauge chart.
-6. Ships with Docker, automated tests, logging, and CI-ready structure.
 
-> **Dataset note:** This environment doesn't have live internet access to pull a dataset from
-> Kaggle/UCI/data.gov, so `src/generate_data.py` synthesizes a realistic dataset by simulating
-> pollutant concentrations within real-world observed ranges and computing AQI using the **actual
-> CPCB sub-index breakpoint formula** (piecewise linear interpolation) — the same method India's
-> Central Pollution Control Board uses. To use a real dataset instead, drop a CSV with columns
-> `PM2_5, PM10, NO2, SO2, CO, O3, Temperature, Humidity, WindSpeed, AQI` into `data/aqi_data.csv`
-> and skip the generation step — the rest of the pipeline is dataset-agnostic.
-
----
-
+   
 ## 🏗 Architecture
 
 ```
@@ -140,16 +107,6 @@ AQI-Prediction/
 └── .github/                     # Issue + PR templates
 ```
 
----
-
-## 🖼 Screenshots
-
-> _Add your own screenshots here after running the dashboard locally, e.g.:_
-> `outputs/dashboard_screenshot.png`
-
-- `[Dashboard Home — Screenshot Placeholder]`
-- `[Prediction Gauge Chart — Screenshot Placeholder]`
-- `[FastAPI Swagger Docs — Screenshot Placeholder]`
 
 ---
 
@@ -211,40 +168,7 @@ streamlit run streamlit_app/app.py
 
 ---
 
-## 🔌 REST API
 
-Base URL (local): `http://localhost:8000`
-
-| Method | Endpoint   | Description                              |
-|--------|-----------|-------------------------------------------|
-| GET    | `/`        | Health check — confirms API & model status |
-| POST   | `/predict` | Predict AQI from sensor readings           |
-| GET    | `/docs`    | Interactive Swagger UI (auto-generated)     |
-
-**Example request:**
-
-```bash
-curl -X POST http://localhost:8000/predict \
-  -H "Content-Type: application/json" \
-  -d '{
-        "PM2_5": 120.5, "PM10": 210.3, "NO2": 65.2, "SO2": 25.1,
-        "CO": 2.8, "O3": 40.0, "Temperature": 18.5,
-        "Humidity": 75.0, "WindSpeed": 1.2
-      }'
-```
-
-**Example response:**
-
-```json
-{
-  "predicted_aqi": 343.45,
-  "category": "Very Poor",
-  "color": "#ff0000",
-  "health_advice": "Respiratory illness on prolonged exposure. Avoid outdoor activity."
-}
-```
-
----
 
 ## 🤖 Model Details
 
@@ -285,62 +209,8 @@ The best-performing model (by test R²) was automatically selected and further t
 
 *(Full leaderboard: `outputs/model_leaderboard.csv`, regenerated each time `train.py` runs.)*
 
-**Winner: CatBoost** — after `GridSearchCV` tuning (`depth=4, iterations=400, learning_rate=0.1`),
-achieving **R² ≈ 0.86** and **RMSE ≈ 55.6** on the held-out test set.
 
-### Feature Importance
-![Feature Importance](outputs/feature_importance.png)
 
-PM2.5 and PM10 dominate, consistent with the CPCB methodology where AQI equals the maximum
-sub-index across pollutants, and particulates are typically the binding constraint.
-
-### Actual vs Predicted
-![Actual vs Predicted](outputs/actual_vs_predicted.png)
-
-### Residual Plot
-![Residuals](outputs/residual_plot.png)
-
-### Feature Correlation Heatmap
-![Correlation Heatmap](outputs/correlation_heatmap.png)
-
----
-
-## 🧪 Testing
-
-18 automated tests cover preprocessing, prediction, and the API layer:
-
-```bash
-pytest tests/ -v
-```
-
-```
-tests/test_api.py .....              [ 5 passed]
-tests/test_predict.py .......        [ 7 passed]
-tests/test_preprocessing.py ......   [ 6 passed]
-======= 18 passed =======
-```
-
----
-
-## 🐳 Docker Deployment
-
-Build and run the API + dashboard together:
-
-```bash
-docker-compose up --build
-```
-
-- API available at `http://localhost:8000`
-- Dashboard available at `http://localhost:8501`
-
-Or build/run a single image manually:
-
-```bash
-docker build -t aqi-prediction .
-docker run -p 8000:8000 aqi-prediction
-```
-
----
 
 ## 🔮 Future Improvements
 
@@ -350,13 +220,6 @@ docker run -p 8000:8000 aqi-prediction
 - Add CI/CD (GitHub Actions) to run tests and build the Docker image on every push.
 - Add authentication/rate-limiting to the FastAPI service for public deployment.
 - Persist prediction history to a database instead of Streamlit session state.
-
----
-
-## 🤝 Contributing
-
-Contributions are welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines, and check the
-issue templates under `.github/ISSUE_TEMPLATE/` before opening a new issue.
 
 ---
 
